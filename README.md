@@ -2,12 +2,13 @@ This project is a mobile version for the tunari services
 
 ## To install
 
-    * run: npm install
+    * Install ionic
+    * Run: npm install
 
 ## To run it
 
     * Run: ionic serve
-    * Navigate to localhost:8081
+    * Navigate to http://localhost:8081
     * You can add a query parameter ionicplatform=windows to test 
       other platforms.
 
