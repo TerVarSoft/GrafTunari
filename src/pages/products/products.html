@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>
+      Productos Tunari 
+    </ion-title>
+  </ion-navbar>
+
+  <ion-toolbar color="primary">
+    <ion-searchbar placeholder="Busca un producto en GrafTunari!">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list>
+    <ion-item *ngFor="let product of products">
+      <ion-thumbnail item-left>
+        <product-img [product]="product"></product-img>
+      </ion-thumbnail>
+      <h2>{{product.name}}</h2>
+      <p *ngIf="product.publicPackagePrice.value">
+        {{product.publicPackagePrice.type}}: {{product.publicPackagePrice.value}} Bs.
+      </p>
+      <button ion-button clear item-right>Ver</button>
+    </ion-item>
+  </ion-list>
+</ion-content>
