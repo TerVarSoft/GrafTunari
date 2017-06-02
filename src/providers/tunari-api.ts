@@ -25,9 +25,9 @@ export class TunariApi {
     this.headers = new Headers({ 'Content-Type': 'application/json' });
   }
 
-  get(endpoint: string) {
+  get(endpoint: string, requestOptions: RequestOptions = new RequestOptions()) {
     let url = this.baseUrl + endpoint;
-    let requestOptions = new RequestOptions({ headers: new Headers(this.headers) });
+    requestOptions.headers = new Headers(this.headers);
 
     return this.getApiToken().flatMap(token => {
       if(token) {

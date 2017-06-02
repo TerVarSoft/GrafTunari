@@ -17,7 +17,7 @@ export class ProductsPage {
 
   constructor(public navCtrl: NavController, productsProvider: Products, util: ProductsUtil) {    
 
-    productsProvider.get()
+    productsProvider.getFavorites()
       .map(productsObject => util.processProductObject(productsObject))
       .subscribe(products => this.products = products);
   }  
