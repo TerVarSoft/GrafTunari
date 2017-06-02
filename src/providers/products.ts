@@ -17,8 +17,12 @@ export class Products {
 
   constructor(public api: TunariApi) { }
 
-  get() {
-    return this.api.get(this.endpoint);
+  get(query: string) {
+    let params: URLSearchParams = new URLSearchParams();
+    params.set('tags', query); 
+    let requestOptions = new RequestOptions({search: params});        
+
+    return this.api.get(this.endpoint, requestOptions);
   }
 
   getFavorites() {    
