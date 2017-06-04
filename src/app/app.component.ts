@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LoadingController, AlertController, Platform } from 'ionic-angular';
+import { LoadingController, AlertController, Platform, Loading } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
@@ -43,36 +43,58 @@ export class GrafTunariApp {
   }
 
   private initialSetup() {
-    let loader = this.loadingCtrl.create();
-    this.initialLogin(loader);         
+        
+    this.initialLogin();         
   }
 
-  private initialLogin(loader) {    
-    loader.setContent("Autenticando GrafTunari");
-    loader.present();
+  private initialLogin() {            
     this.storage.getAuthtoken().then(token => {
       if(!token) {        
+        let loader = this.createLoader("Autenticando GrafTunari");        
         this.login.post().subscribe(resp => {
           this.userToken = resp;
           this.storage.setAuthToken(this.userToken.token);                                      
+          
           console.log("Token Authentication: " + this.userToken.token);
-
-          this.loadConfiguration(loader);
+          loader.dismiss();
+          this.loadConfiguration();
         });
       }
       else {
         console.log("Already Authenticated");        
-        this.loadConfiguration(loader);
+        this.loadConfiguration();
       }
     });   
   }
 
-  private loadConfiguration(loader) {
-    loader.setContent("Cargando configuraciones basicas");
-    this.settingsProvider.load().add(() => {      
-      this.isReady = true;
-      loader.dismiss();
-    });
+  private loadConfiguration() {    
+    
+    this.settingsProvider.loadFromStorage().then(settings => {
+      if(settings) {
+        console.log("Settings loaded from local storage...");
+        this.finishLoading();
+        this.settingsProvider.loadFromServer();
+      } else {
+        let loader = this.createLoader("Cargando configuraciones basicas");
+        this.settingsProvider.loadFromServer().add(() => {
+          console.log("Settings loaded from the server...");
+          this.finishLoading();
+          loader.dismiss();          
+        });
+      }                  
+    });    
+  }
+
+  private createLoader(message: string): Loading {
+    let loader = this.loadingCtrl.create();  
+    loader.setContent(message);
+    loader.present();
+
+    return loader;
+  }
+
+  private finishLoading() {
+    this.isReady = true;           
   }
 }
 

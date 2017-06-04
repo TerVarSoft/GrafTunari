@@ -4,6 +4,7 @@ import 'rxjs/add/operator/map';
 
 
 import { TunariApi } from './tunari-api';
+import { TunariStorage } from './tunari-storage';
 
 /**
  * Products endpoint provider. 
@@ -15,7 +16,7 @@ export class Products {
 
   endpoint: string = "products";
 
-  constructor(public api: TunariApi) { }
+  constructor(public api: TunariApi, public storage: TunariStorage) { }
 
   get(query: string) {
     let params: URLSearchParams = new URLSearchParams();
@@ -26,10 +27,18 @@ export class Products {
   }
 
   getFavorites() {    
+    return this.storage.getProductFavorites();
+  }
+
+  loadFavoritesFromServer() {        
     let params: URLSearchParams = new URLSearchParams();
     params.set('isFavorite', "true"); 
     let requestOptions = new RequestOptions({search: params});        
 
-    return this.api.get(this.endpoint, requestOptions);
+    return this.api.get(this.endpoint, requestOptions)
+      .map(productsObject => {
+        this.storage.setProductFavorites(productsObject);
+        return productsObject;
+      });      
   }  
 }

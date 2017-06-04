@@ -9,6 +9,10 @@ export class TunariStorage {
 
   private authTokenKey: string = "authToken";
 
+  private settingsKey: string = "settings";
+  
+  private productFavoritesKey: string = "productFavorites";
+
   constructor(public storage: Storage) {}
 
   public getAuthtoken() {
@@ -17,6 +21,26 @@ export class TunariStorage {
 
   public setAuthToken(value: string) {
     this.setValue(this.authTokenKey, value);
+  }
+
+  public getSettings() {
+    return this.getValue(this.settingsKey).then(settings => {
+      return JSON.parse(settings);
+    }); 
+  }
+
+  public setSettings(value: any) {    
+    this.setValue(this.settingsKey, JSON.stringify(value));
+  }
+
+  public getProductFavorites() {
+    return this.getValue(this.productFavoritesKey).then(favorites => {
+      return JSON.parse(favorites);
+    }); 
+  }
+
+  public setProductFavorites(value: any) {    
+    this.setValue(this.productFavoritesKey, JSON.stringify(value));
   }
 
   private getValue(key: string) {
