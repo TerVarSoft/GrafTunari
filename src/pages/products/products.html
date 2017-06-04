@@ -18,6 +18,7 @@
         <product-img [product]="product"></product-img>
       </ion-thumbnail>
       <h2>{{product.name}}</h2>
+      <h3>{{product.properties.type}}</h3>
       <p *ngIf="product.publicPackagePrice.value">
         {{product.publicPackagePrice.type}}: {{product.publicPackagePrice.value}} Bs.
       </p>

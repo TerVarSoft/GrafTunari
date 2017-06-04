@@ -25,29 +25,30 @@ export class ProductsPage {
   constructor(public navCtrl: NavController, 
     public productsProvider: Products, 
     public util: ProductsUtil,
-    public loadingCtrl: LoadingController) {    
+    public loadingCtrl: LoadingController) {        
+    
+    this.initFavorites();    
+    this.initSearchQuery();
+  }  
 
-    productsProvider.getFavorites().then(productsObject => {
+  private initFavorites() {
+    this.productsProvider.getFavorites().then(productsObject => {
       if(productsObject) {
         console.log("Loading products from storage...");
-        this.products = util.processProductObject(productsObject);
+        this.products = this.util.processProductObject(productsObject);
         this.productsProvider.loadFavoritesFromServer();
       } else {
         console.log("Loading products from the server...");
         let loader = this.createLoader("Cargando Novedades");
-        productsProvider.loadFavoritesFromServer()
-          .map(productsObject => util.processProductObject(productsObject))
+        this.productsProvider.loadFavoritesFromServer()
+          .map(productsObject => this.util.processProductObject(productsObject))
           .subscribe(products => {
             this.products = products
             loader.dismiss();
           });          
       }
     });
-
-    
-
-    this.initSearchQuery();
-  }  
+  }
 
   private initSearchQuery() {
     this.searchQuery.valueChanges
