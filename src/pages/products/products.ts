@@ -52,6 +52,7 @@ export class ProductsPage {
 
   private initSearchQuery() {
     this.searchQuery.valueChanges
+      .filter(query => query)
       .debounceTime(100)
       .distinctUntilChanged()
       .switchMap(query => this.productsProvider.get(query))
