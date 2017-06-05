@@ -2,9 +2,11 @@ import { Component } from '@angular/core';
 import { LoadingController, AlertController, Platform } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
+import { Network } from "@ionic-native/network";
 
 import { ProductsPage } from '../pages/products/products';
 
+import { Connection } from '../providers/connection';
 import { Login } from '../providers/login';
 import { SettingsCache } from '../providers/settings-cache';
 import { TunariMessages } from '../providers/tunari-messages';
@@ -26,7 +28,8 @@ export class GrafTunariApp {
 
   constructor(
     public platform: Platform, 
-    statusBar: StatusBar, 
+    statusBar: StatusBar,
+    public network: Network, 
     splashScreen: SplashScreen,    
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,    
@@ -34,15 +37,28 @@ export class GrafTunariApp {
     public messages: TunariMessages,
     public notifier: TunariNotifier,
     public settingsProvider: SettingsCache,
-    public login: Login
+    public login: Login,
+    public connection: Connection
   ) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
-    });
 
+      this.network.onDisconnect().subscribe(() => {
+        this.notifier.createToast(this.messages.noInternetError);
+      });
+
+      this.network.onConnect().subscribe(() => {
+        this.notifier.createToast(this.messages.connectedToInternet);
+      });
+
+      if(!connection.isConnected()) {
+        this.notifier.createToast(this.messages.noInternetError);
+      }
+    });
+        
     this.initialSetup();
   }
 
@@ -62,9 +78,6 @@ export class GrafTunariApp {
           console.log("Token Authentication: " + this.userToken.token);
           loader.dismiss();
           this.loadConfiguration();
-        }, error => { 
-          loader.dismiss();
-          this.handlePullProductsError(error);
         });
       }
       else {
@@ -80,16 +93,13 @@ export class GrafTunariApp {
       if(settings) {
         console.log("Settings loaded from local storage...");
         this.finishLoading();
-        this.settingsProvider.loadFromServer();
+        this.settingsProvider.loadFromServer().subscribe();
       } else {
         let loader = this.notifier.createLoader(this.messages.loadingSettings);
         this.settingsProvider.loadFromServer().subscribe(() => {
           console.log("Settings loaded from the server...");
           this.finishLoading();
           loader.dismiss();          
-        }, error => {
-          loader.dismiss();
-          this.handlePullProductsError(error);
         });
       }                  
     });    
@@ -98,11 +108,5 @@ export class GrafTunariApp {
   private finishLoading() {
     this.isReady = true;           
   }
-
-  private handlePullProductsError(error) {
-    if(error.status === 0) {
-      this.notifier.createToast(this.messages.noInternetError);
-    }
-  }  
 }
 

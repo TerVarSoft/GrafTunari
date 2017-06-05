@@ -7,9 +7,11 @@ import { Injectable } from '@angular/core';
 export class TunariMessages {  
   
   authenticating: string = `Autenticando GrafTunari`;
+
+  connectedToInternet: string = `Ahora estas conectado!`;
   
   loadingSettings: string = `Cargando configuraciones basicas`;
 
   noInternetError: string = `No estas conectado a Internet!,
-        "por favor verifica tu conexion y vuelve a intentarl`;      
+        por favor verifica tu conexion y vuelve a intentarl`;      
 }

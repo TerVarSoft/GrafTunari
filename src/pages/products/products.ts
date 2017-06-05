@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NavController } from 'ionic-angular';
+import 'rxjs/add/observable/from';
 import "rxjs/add/operator/debounceTime";
 import "rxjs/add/operator/distinctUntilChanged"
 import "rxjs/add/operator/switchMap";
 
+import { Connection } from '../../providers/connection';
 import { Products } from '../../providers/products';
 import { ProductsUtil } from './products-util';
 import { TunariMessages } from '../../providers/tunari-messages';
@@ -22,25 +24,46 @@ export class ProductsPage {
   private products: Product[];
 
   private searchQuery: FormControl = new FormControl();
+  
+  private page: number = 0;
 
-  private page: number = 1;
-
-  constructor(public navCtrl: NavController, 
+  constructor(public navCtrl: NavController,     
     public productsProvider: Products, 
     public util: ProductsUtil, 
     public notifier: TunariNotifier,
-    public messages: TunariMessages) {        
-    
+    public messages: TunariMessages,
+    public connection: Connection) {
+
     this.initFavorites();    
     this.initSearchQuery();
-  }  
+  }    
+
+  public pullNextProductsPage(infiniteScroll) {
+        
+    if(this.page > 0 && this.connection.isConnected()) {
+      this.page ++;
+      console.log('Pulling page ' + this.page + '...');
+      this.productsProvider.get(this.searchQuery.value, this.page)
+      .map(productsObject => this.util.processProductObject(productsObject))      
+      .subscribe( 
+        products => this.products.push(...products),
+        null,
+        () => {
+          infiniteScroll.complete();
+          console.log('Finished pulling page successfully');
+      });
+    } else {
+      infiniteScroll.complete();
+    }    
+  }
 
   private initFavorites() {
+    this.page = 0;
     this.productsProvider.getFavorites().then(productsObject => {
       if(productsObject) {
         console.log("Favorites pulled from storage...");
         this.products = this.util.processProductObject(productsObject);
-        this.productsProvider.loadFavoritesFromServer();
+        this.productsProvider.loadFavoritesFromServer().subscribe();
       } else {
         console.log("Favorites pulled from the server...");
         let loader = this.notifier.createLoader("Cargando Novedades");
@@ -49,32 +72,15 @@ export class ProductsPage {
           .subscribe(products => {
             this.products = products
             loader.dismiss();
-          }, error => this.handlePullProductsError(error));          
+          });          
       }
     });
-  }
-
-  private pullNextProductsPage(infiniteScroll) {
-      this.page ++;
-      console.log('Pulling page ' + this.page + '...');
-      
-      this.productsProvider.get(this.searchQuery.value, this.page)
-        .map(productsObject => this.util.processProductObject(productsObject))
-        .subscribe( 
-            products => this.products.push(...products),
-            error => {
-              this.handlePullProductsError(error);
-              infiniteScroll.complete();
-            },
-            () => {
-              infiniteScroll.complete();
-              console.log('Finished pulling page successfully');
-        });
   }
 
   private initSearchQuery() {
     this.searchQuery.valueChanges
       .filter(query => query)
+      .filter(query => this.connection.isConnected())
       .debounceTime(100)
       .distinctUntilChanged()
       .switchMap(query => this.productsProvider.get(query))
@@ -82,12 +88,15 @@ export class ProductsPage {
       .subscribe(products => {
         this.page = 1;
         this.products = products
-      }, error => this.handlePullProductsError(error));
+      });
+
+    this.searchQuery.valueChanges
+      .filter(query => query)
+      .filter(query => !this.connection.isConnected())
+      .subscribe(() => this.notifier.createToast(this.messages.noInternetError));
+    
+    this.searchQuery.valueChanges
+      .filter(query => !query)
+      .subscribe(() => this.initFavorites());      
   }
-  
-  private handlePullProductsError(error) {
-    if(error.status === 0) {
-      this.notifier.createToast(this.messages.noInternetError);
-    }
-  }  
 }

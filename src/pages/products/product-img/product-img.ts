@@ -21,7 +21,14 @@ export class ProductImg implements OnInit {
   ngOnInit() {    
     this.api
       .getImage(this.util.buildProductImgUrl(this.product))
-      .subscribe(url => this.productImgUrl = url);
+      .subscribe(url => this.productImgUrl = url,
+      error => {
+        if(error.status === 0) {
+          this.productImgUrl = 'assets/img/errorLoading.gif';
+        } else if(error.status === 404) {
+          this.productImgUrl = 'assets/img/defaultProduct.png';
+        }
+      });
     
   }  
 }

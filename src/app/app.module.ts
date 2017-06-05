@@ -5,11 +5,13 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
+import { Network } from "@ionic-native/network";
 
 import { GrafTunariApp } from './app.component';
 import { ProductsPage } from '../pages/products/products';
 import { ProductImg } from '../pages/products/product-img/product-img';
 
+import { Connection } from '../providers/connection';
 import { Login } from '../providers/login';
 import { TunariNotifier } from '../providers/tunari-notifier';
 import { TunariMessages } from '../providers/tunari-messages';
@@ -21,7 +23,9 @@ import { TunariStorage } from '../providers/tunari-storage';
 
 export function providers() {
   return [
+    Connection,
     Login,    
+    Network,
     Products,    
     Settings,
     SettingsCache,
