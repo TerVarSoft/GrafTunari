@@ -18,10 +18,11 @@ export class Products {
 
   constructor(public api: TunariApi, public storage: TunariStorage) { }
 
-  get(query: string) {
+  get(query: string, page: number = 1) {
     let params: URLSearchParams = new URLSearchParams();
     let commonTags = "Invitaciones ";
     params.set('tags', commonTags + query); 
+    params.set('page', page.toString()); 
     let requestOptions = new RequestOptions({search: params});        
 
     return this.api.get(this.endpoint, requestOptions);

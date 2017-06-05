@@ -11,6 +11,8 @@ import { ProductsPage } from '../pages/products/products';
 import { ProductImg } from '../pages/products/product-img/product-img';
 
 import { Login } from '../providers/login';
+import { TunariNotifier } from '../providers/tunari-notifier';
+import { TunariMessages } from '../providers/tunari-messages';
 import { Products } from '../providers/products';
 import { Settings } from '../providers/settings';
 import { SettingsCache } from '../providers/settings-cache';
@@ -19,14 +21,16 @@ import { TunariStorage } from '../providers/tunari-storage';
 
 export function providers() {
   return [
-    Login,
+    Login,    
     Products,    
     Settings,
     SettingsCache,
-    TunariApi,
-    TunariStorage,    
-    StatusBar,
     SplashScreen,
+    StatusBar,    
+    TunariApi,
+    TunariMessages,
+    TunariNotifier,
+    TunariStorage,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ];
 }

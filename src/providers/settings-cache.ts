@@ -33,9 +33,11 @@ export class SettingsCache {
   loadFromServer() {
     return this.settingsProvider.get()
       .map(settingsResponse => settingsResponse.items)
-      .subscribe(settings => {        
+      .map(settings => {
         this.storage.setSettings(settings);
         this.settings = settings;
+
+        return settings;
       });    
   }
 }

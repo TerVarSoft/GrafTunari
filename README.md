@@ -12,11 +12,11 @@ This project is a mobile version for the tunari services
     * You can add a query parameter ionicplatform=windows to test 
       other platforms.
 
-# To build and run in android
+## To build and run in android
 
     * ionic cordova run --device android
 
-## Ionic default documentation
+# Ionic default documentation
 
 This is a starter template for [Ionic](http://ionicframework.com/docs/) projects.
 

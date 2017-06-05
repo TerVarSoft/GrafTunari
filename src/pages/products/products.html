@@ -22,7 +22,11 @@
       <p *ngIf="product.publicPackagePrice.value">
         {{product.publicPackagePrice.type}}: {{product.publicPackagePrice.value}} Bs.
       </p>
-      <button ion-button clear item-right>Ver</button>
     </ion-item>
   </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="pullNextProductsPage($event)">
+   <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando mas productos">     
+   </ion-infinite-scroll-content>
+ </ion-infinite-scroll>
 </ion-content>

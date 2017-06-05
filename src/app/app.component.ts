@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-import { LoadingController, AlertController, Platform, Loading } from 'ionic-angular';
+import { LoadingController, AlertController, Platform } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
 import { ProductsPage } from '../pages/products/products';
 
 import { Login } from '../providers/login';
-import { TunariStorage } from '../providers/tunari-storage';
 import { SettingsCache } from '../providers/settings-cache';
+import { TunariMessages } from '../providers/tunari-messages';
+import { TunariNotifier } from '../providers/tunari-notifier';
+import { TunariStorage } from '../providers/tunari-storage';
 
 import { UserToken } from '../models/user-token';
 
@@ -29,6 +31,8 @@ export class GrafTunariApp {
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,    
     public storage: TunariStorage,
+    public messages: TunariMessages,
+    public notifier: TunariNotifier,
     public settingsProvider: SettingsCache,
     public login: Login
   ) {
@@ -50,7 +54,7 @@ export class GrafTunariApp {
   private initialLogin() {            
     this.storage.getAuthtoken().then(token => {
       if(!token) {        
-        let loader = this.createLoader("Autenticando GrafTunari");        
+        let loader = this.notifier.createLoader(this.messages.authenticating);
         this.login.post().subscribe(resp => {
           this.userToken = resp;
           this.storage.setAuthToken(this.userToken.token);                                      
@@ -58,6 +62,9 @@ export class GrafTunariApp {
           console.log("Token Authentication: " + this.userToken.token);
           loader.dismiss();
           this.loadConfiguration();
+        }, error => { 
+          loader.dismiss();
+          this.handlePullProductsError(error);
         });
       }
       else {
@@ -75,26 +82,27 @@ export class GrafTunariApp {
         this.finishLoading();
         this.settingsProvider.loadFromServer();
       } else {
-        let loader = this.createLoader("Cargando configuraciones basicas");
-        this.settingsProvider.loadFromServer().add(() => {
+        let loader = this.notifier.createLoader(this.messages.loadingSettings);
+        this.settingsProvider.loadFromServer().subscribe(() => {
           console.log("Settings loaded from the server...");
           this.finishLoading();
           loader.dismiss();          
+        }, error => {
+          loader.dismiss();
+          this.handlePullProductsError(error);
         });
       }                  
     });    
-  }
-
-  private createLoader(message: string): Loading {
-    let loader = this.loadingCtrl.create();  
-    loader.setContent(message);
-    loader.present();
-
-    return loader;
-  }
+  }  
 
   private finishLoading() {
     this.isReady = true;           
   }
+
+  private handlePullProductsError(error) {
+    if(error.status === 0) {
+      this.notifier.createToast(this.messages.noInternetError);
+    }
+  }  
 }
 
