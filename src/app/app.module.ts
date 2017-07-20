@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { Keyboard } from '@ionic-native/keyboard';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -9,7 +10,8 @@ import { Network } from "@ionic-native/network";
 
 import { GrafTunariApp } from './app.component';
 import { ProductsPage } from '../pages/products/products';
-import { ProductImg } from '../pages/products/product-img/product-img';
+import { ProductImgComponent } from '../pages/products/product-img/product-img.component';
+import { SafeUrlPipe } from '../pipes/safe-url.pipe';
 
 import { Connection } from '../providers/connection';
 import { Login } from '../providers/login';
@@ -24,13 +26,14 @@ import { TunariStorage } from '../providers/tunari-storage';
 export function providers() {
   return [
     Connection,
-    Login,    
+    Keyboard,
+    Login,
     Network,
-    Products,    
+    Products,
     Settings,
     SettingsCache,
     SplashScreen,
-    StatusBar,    
+    StatusBar,
     TunariApi,
     TunariMessages,
     TunariNotifier,
@@ -43,7 +46,8 @@ export function providers() {
   declarations: [
     GrafTunariApp,
     ProductsPage,
-    ProductImg
+    ProductImgComponent,
+    SafeUrlPipe
   ],
   imports: [
     BrowserModule,

@@ -61,13 +61,11 @@ export class TunariApi {
 
       return this.http.get(productUrl, requestOptions)
         .map(res => res.blob())
-        .map(blob => URL.createObjectURL(blob))
-        .map(url => this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        .map(blob => URL.createObjectURL(blob))        
     });      
   }
 
   private getApiToken(): Observable<Headers> {
-    return Observable.fromPromise(this.storage.getAuthtoken())
-      .filter(token => token !== null);
+    return Observable.fromPromise(this.storage.getAuthtoken());
   }
 }

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, Renderer } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NavController } from 'ionic-angular';
+import { NavController, Alert, FabContainer } from 'ionic-angular';
+import { Keyboard } from '@ionic-native/keyboard';
 import 'rxjs/add/observable/from';
 import "rxjs/add/operator/debounceTime";
 import "rxjs/add/operator/distinctUntilChanged"
@@ -27,14 +28,23 @@ export class ProductsPage {
   
   private page: number = 0;
 
-  constructor(public navCtrl: NavController,     
+  private selectedPrice: string;
+
+  private selectedPriceText: string;
+
+  constructor(public keyboard: Keyboard,
+    public renderer: Renderer,
+    private elRef:ElementRef,
+    public navCtrl: NavController,
     public productsProvider: Products, 
     public util: ProductsUtil, 
     public notifier: TunariNotifier,
     public messages: TunariMessages,
     public connection: Connection) {
-
-    this.initFavorites();    
+    
+    this.setDefaultValues();
+    this.setupKeyboard();
+    this.initFavorites();
     this.initSearchQuery();
   }    
 
@@ -44,7 +54,7 @@ export class ProductsPage {
       this.page ++;
       console.log('Pulling page ' + this.page + '...');
       this.productsProvider.get(this.searchQuery.value, this.page)
-      .map(productsObject => this.util.processProductObject(productsObject))      
+      .map(productsObject => productsObject.items)
       .subscribe( 
         products => this.products.push(...products),
         null,
@@ -55,6 +65,46 @@ export class ProductsPage {
     } else {
       infiniteScroll.complete();
     }    
+  }  
+
+  onSearchClear(event) {
+    this.blurSearchBar();
+  }
+
+  /** Main Fab button functions. */
+
+  selectPriceToShow(fab: FabContainer) {
+    fab.close();
+    let alert: Alert = this.util.getSelectPriceAlert(this.selectedPrice);
+        
+    alert.addButton({
+      text: 'OK',
+      handler: key => {
+        this.selectedPrice = key;
+        this.selectedPriceText = this.util.getSelectedPriceText(key);
+      }
+    });
+    alert.present();
+  }  
+
+  /** Private functions */
+
+  private setDefaultValues() {
+    this.selectedPrice = "clientPackagePrice";
+    this.selectedPriceText 
+      = this.util.getSelectedPriceText(this.selectedPrice);
+  }
+
+  private setupKeyboard() {
+    this.keyboard.onKeyboardHide().subscribe(() => {
+      this.blurSearchBar();
+    });
+  }
+
+  private blurSearchBar() {
+    const searchInput = this.elRef.nativeElement.querySelector('.searchbar-input')    
+    this.renderer
+      .invokeElementMethod(searchInput, 'blur');
   }
 
   private initFavorites() {
@@ -62,19 +112,25 @@ export class ProductsPage {
     this.productsProvider.getFavorites().then(productsObject => {
       if(productsObject) {
         console.log("Favorites pulled from storage...");
-        this.products = this.util.processProductObject(productsObject);
-        this.productsProvider.loadFavoritesFromServer().subscribe();
+        this.products = productsObject.items;
+        this.updateFavoritesInBackground();
       } else {
         console.log("Favorites pulled from the server...");
         let loader = this.notifier.createLoader("Cargando Novedades");
         this.productsProvider.loadFavoritesFromServer()
-          .map(productsObject => this.util.processProductObject(productsObject))
+          .map(productsObject => productsObject.items)
           .subscribe(products => {
             this.products = products
             loader.dismiss();
-          });          
+          });
       }
     });
+  }
+
+  private updateFavoritesInBackground() {
+    // Update storage in backgroun with server response.
+    console.log("Updating product favorites in background");
+    this.productsProvider.loadFavoritesFromServer().subscribe();
   }
 
   private initSearchQuery() {
@@ -84,7 +140,7 @@ export class ProductsPage {
       .debounceTime(100)
       .distinctUntilChanged()
       .switchMap(query => this.productsProvider.get(query))
-      .map(productsObject => this.util.processProductObject(productsObject))
+      .map(productsObject => productsObject.items)
       .subscribe(products => {
         this.page = 1;
         this.products = products
@@ -97,6 +153,6 @@ export class ProductsPage {
     
     this.searchQuery.valueChanges
       .filter(query => !query)
-      .subscribe(() => this.initFavorites());      
+      .subscribe(() => this.initFavorites());
   }
 }

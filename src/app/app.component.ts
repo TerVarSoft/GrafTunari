@@ -73,15 +73,15 @@ export class GrafTunariApp {
         let loader = this.notifier.createLoader(this.messages.authenticating);
         this.login.post().subscribe(resp => {
           this.userToken = resp;
-          this.storage.setAuthToken(this.userToken.token);                                      
-          
-          console.log("Token Authentication: " + this.userToken.token);
-          loader.dismiss();
-          this.loadConfiguration();
+          this.storage.setAuthToken(this.userToken.token).then(() => {
+            console.log("Token Authentication has been sent from the server");
+            loader.dismiss();
+            this.loadConfiguration();
+          });                    
         });
       }
       else {
-        console.log("Already Authenticated");        
+        console.log("Already Authenticated");
         this.loadConfiguration();
       }
     });   
