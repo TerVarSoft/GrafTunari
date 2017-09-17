@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { LoadingController, AlertController, Platform } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { LoadingController, AlertController, Platform, NavController } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Network } from "@ionic-native/network";
@@ -13,100 +13,60 @@ import { TunariMessages } from '../providers/tunari-messages';
 import { TunariNotifier } from '../providers/tunari-notifier';
 import { TunariStorage } from '../providers/tunari-storage';
 
-import { UserToken } from '../models/user-token';
-
 @Component({
-  templateUrl: 'app.html',
+    templateUrl: 'app.html',
 })
 export class GrafTunariApp {
-  
-  rootPage:any = ProductsPage;
 
-  private userToken: UserToken;
+    @ViewChild('rootNavController') navCtrl: NavController;
 
-  private isReady: boolean = false;
+    rootPage: any = ProductsPage;
 
-  constructor(
-    public platform: Platform, 
-    statusBar: StatusBar,
-    public network: Network, 
-    splashScreen: SplashScreen,    
-    public alertCtrl: AlertController,
-    public loadingCtrl: LoadingController,    
-    public storage: TunariStorage,
-    public messages: TunariMessages,
-    public notifier: TunariNotifier,
-    public settingsProvider: SettingsCache,
-    public login: Login,
-    public connection: Connection
-  ) {
-    platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      statusBar.styleDefault();
-      splashScreen.hide();
+    isReady: boolean = false;
 
-      this.network.onDisconnect().subscribe(() => {
-        this.notifier.createToast(this.messages.noInternetError);
-      });
+    constructor(
+        public platform: Platform,
+        statusBar: StatusBar,
+        public network: Network,
+        splashScreen: SplashScreen,
+        public alertCtrl: AlertController,
+        public loadingCtrl: LoadingController,
+        public storage: TunariStorage,
+        public messages: TunariMessages,
+        public notifier: TunariNotifier,
+        public settingsProvider: SettingsCache,
+        public login: Login,
+        public connection: Connection
+    ) {
+        platform.ready().then(() => {
+            // Okay, so the platform is ready and our plugins are available.
+            // Here you can do any higher level native things you might need.
+            statusBar.styleDefault();
+            splashScreen.hide();
 
-      this.network.onConnect().subscribe(() => {
-        this.notifier.createToast(this.messages.connectedToInternet);
-      });
+            this.network.onDisconnect().subscribe(() => {
+                this.notifier.createToast(this.messages.noInternetError);
+            });
 
-      if(!connection.isConnected()) {
-        this.notifier.createToast(this.messages.noInternetError);
-      }
-    });
-        
-    this.initialSetup();
-  }
+            this.network.onConnect().subscribe(() => {
+                this.notifier.createToast(this.messages.connectedToInternet);
+            });
 
-  private initialSetup() {
-        
-    this.initialLogin();         
-  }
+            if (!connection.isConnected()) {
+                this.notifier.createToast(this.messages.noInternetError);
+            }
 
-  private initialLogin() {            
-    this.storage.getAuthtoken().then(token => {
-      if(!token) {        
+            this.initialLogin();
+        });
+    }
+
+    private initialLogin() {
+
         let loader = this.notifier.createLoader(this.messages.authenticating);
-        this.login.post().subscribe(resp => {
-          this.userToken = resp;
-          this.storage.setAuthToken(this.userToken.token).then(() => {
-            console.log("Token Authentication has been sent from the server");
+        this.login.authenticate("", "").subscribe(() => {
+            this.isReady = true;
             loader.dismiss();
-            this.loadConfiguration();
-          });                    
         });
-      }
-      else {
-        console.log("Already Authenticated");
-        this.loadConfiguration();
-      }
-    });   
-  }
-
-  private loadConfiguration() {    
-    
-    this.settingsProvider.loadFromStorage().then(settings => {
-      if(settings) {
-        console.log("Settings loaded from local storage...");
-        this.finishLoading();
-        this.settingsProvider.loadFromServer().subscribe();
-      } else {
-        let loader = this.notifier.createLoader(this.messages.loadingSettings);
-        this.settingsProvider.loadFromServer().subscribe(() => {
-          console.log("Settings loaded from the server...");
-          this.finishLoading();
-          loader.dismiss();          
-        });
-      }                  
-    });    
-  }  
-
-  private finishLoading() {
-    this.isReady = true;           
-  }
+    }
 }
 

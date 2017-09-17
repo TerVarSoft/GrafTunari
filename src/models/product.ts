@@ -3,15 +3,15 @@
  */
 export class Product {
 
-  name: string;
+    name: string;
 
-  category: string;
+    category: string;
 
-  properties: any;  
+    properties: any;
 
-  publicPackagePrice: number;
-  
-  publicUnitPrice: number;
+    publicPackagePrice: number;
 
-  thumbnailUrl: string;
+    publicUnitPrice: number;
+
+    thumbnailUrl: string;
 }

@@ -9,7 +9,11 @@ import { IonicStorageModule } from '@ionic/storage';
 import { Network } from "@ionic-native/network";
 
 import { GrafTunariApp } from './app.component';
+
 import { ProductsPage } from '../pages/products/products';
+import { LoginPage } from '../pages/login/login';
+import { UserPage } from '../pages/user/user';
+
 import { ProductImgComponent } from '../pages/products/product-img/product-img.component';
 import { SafeUrlPipe } from '../pipes/safe-url.pipe';
 
@@ -24,42 +28,46 @@ import { TunariApi } from '../providers/tunari-api';
 import { TunariStorage } from '../providers/tunari-storage';
 
 export function providers() {
-  return [
-    Connection,
-    Keyboard,
-    Login,
-    Network,
-    Products,
-    Settings,
-    SettingsCache,
-    SplashScreen,
-    StatusBar,
-    TunariApi,
-    TunariMessages,
-    TunariNotifier,
-    TunariStorage,
-    { provide: ErrorHandler, useClass: IonicErrorHandler }
-  ];
+    return [
+        Connection,
+        Keyboard,
+        Login,
+        Network,
+        Products,
+        Settings,
+        SettingsCache,
+        SplashScreen,
+        StatusBar,
+        TunariApi,
+        TunariMessages,
+        TunariNotifier,
+        TunariStorage,
+        { provide: ErrorHandler, useClass: IonicErrorHandler }
+    ];
 }
 
 @NgModule({
-  declarations: [
-    GrafTunariApp,
-    ProductsPage,
-    ProductImgComponent,
-    SafeUrlPipe
-  ],
-  imports: [
-    BrowserModule,
-    HttpModule,
-    IonicModule.forRoot(GrafTunariApp),
-    IonicStorageModule.forRoot()
-  ],
-  bootstrap: [IonicApp],
-  entryComponents: [
-    GrafTunariApp,
-    ProductsPage
-  ],
-  providers: providers()
+    declarations: [
+        GrafTunariApp,
+        ProductsPage,
+        LoginPage,
+        UserPage,
+        ProductImgComponent,
+        SafeUrlPipe
+    ],
+    imports: [
+        BrowserModule,
+        HttpModule,
+        IonicModule.forRoot(GrafTunariApp),
+        IonicStorageModule.forRoot()
+    ],
+    bootstrap: [IonicApp],
+    entryComponents: [
+        GrafTunariApp,
+        ProductsPage,
+        LoginPage,
+        UserPage
+    ],
+    providers: providers()
 })
-export class AppModule {}
+export class AppModule { }

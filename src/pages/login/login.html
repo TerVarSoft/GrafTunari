@@ -1,0 +1,50 @@
+<ion-header>
+    <ion-navbar color="primary">
+        <ion-title>
+            Login
+        </ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <div class="logo">
+        <img src="assets/img/appicon.png" alt="Ionic logo">
+    </div>
+
+    <form #loginForm="ngForm" novalidate>
+        <ion-list no-lines>
+            <ion-item>
+                <ion-label floating>Usuario</ion-label>
+                <ion-input [(ngModel)]="loginInfo.username" name="username" type="text" #username="ngModel" spellcheck="false" autocapitalize="off"
+                    required>
+                </ion-input>
+            </ion-item>
+            <p ion-text [hidden]="username.valid || submitted == false" color="danger" padding-left>
+                Tu usuario es requerido
+            </p>
+
+            <ion-item>
+                <ion-label floating>Password</ion-label>
+                <ion-input [(ngModel)]="loginInfo.password" name="password" type="password" #password="ngModel" required>
+                </ion-input>
+            </ion-item>
+            <p ion-text [hidden]="password.valid || submitted == false" color="danger" padding-left>
+                Tu password es requerido
+            </p>
+        </ion-list>
+
+        <ion-row responsive-sm>
+            <ion-col>
+                <button color="secondary" ion-button (click)="onLogin(loginForm)" type="submit" block>Login</button>
+            </ion-col>
+        </ion-row>
+
+        <ion-card>
+            <ion-card-content>
+                Si usted es una Imprenta cliente de grafica Tunari puede solicitar su cuenta para poder acceder a mas
+                beneficios con la Empresa.
+            </ion-card-content>
+        </ion-card>
+    </form>
+
+</ion-content>

@@ -9,13 +9,13 @@ import { TunariApi } from './tunari-api';
 @Injectable()
 export class Settings {
 
-  baseUrl: string;
+    baseUrl: string;
 
-  endpoint: string = "settings";
+    endpoint: string = "settings";
 
-  constructor(public api: TunariApi) {}
+    constructor(public api: TunariApi) { }
 
-  get() {
-    return this.api.get(this.endpoint);
-  }  
+    get() {
+        return this.api.get(this.endpoint);
+    }
 }

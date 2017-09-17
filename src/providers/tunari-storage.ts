@@ -1,53 +1,80 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/fromPromise';
+
 /**
  * Tunari wrapper to access storage.
  */
 @Injectable()
 export class TunariStorage {
 
-  private authTokenKey: string = "authToken";
+    private authTokenKey: string = "authTokenPublic";
 
-  private settingsKey: string = "settings";
-  
-  private productFavoritesKey: string = "productFavorites";
+    private userKey: string = "userInfo";
+    
+    private userRoleKey: string = 'userRole';
 
-  constructor(public storage: Storage) {}
+    private settingsKey: string = "settings";
 
-  public getAuthtoken() {
-    return this.getValue(this.authTokenKey); 
-  }
+    private productFavoritesKey: string = "productFavorites";
 
-  public setAuthToken(value: string) {
-    return this.setValue(this.authTokenKey, value);
-  }
+    constructor(public storage: Storage) { }
 
-  public getSettings() {
-    return this.getValue(this.settingsKey).then(settings => {
-      return JSON.parse(settings);
-    }); 
-  }
+    public getAuthtoken() {
+        return Observable.fromPromise(this.getValue(this.authTokenKey));
+    }
 
-  public setSettings(value: any) {    
-    this.setValue(this.settingsKey, JSON.stringify(value));
-  }
+    public setAuthToken(value: string) {
+        return Observable.fromPromise(this.setValue(this.authTokenKey, value));
+    }
 
-  public getProductFavorites() {
-    return this.getValue(this.productFavoritesKey).then(favorites => {
-      return JSON.parse(favorites);
-    }); 
-  }
+    public getUser() {
+        return Observable.fromPromise(this.getValue(this.userKey))
+            .map(user => JSON.parse(user));
+    }
 
-  public setProductFavorites(value: any) {    
-    this.setValue(this.productFavoritesKey, JSON.stringify(value));
-  }
+    public setUser(value: any) {
+        return Observable.fromPromise(this.setValue(this.userKey, JSON.stringify(value)));
+    }
 
-  private getValue(key: string) {
-    return this.storage.get(key);
-  }
+    public getUserRole() {
+        return Observable.fromPromise(this.getValue(this.userRoleKey));
+    }
+    
+    public setUserRole(value: string) {
+        return Observable.fromPromise(this.setValue(this.userRoleKey, 'wooork'));
+    }
 
-  private setValue(key: string, value: string) {
-    return this.storage.set(key, value);
-  }
+    public getSettings() {
+        return Observable.fromPromise(this.getValue(this.settingsKey))
+            .map(settings => JSON.parse(settings));
+    }
+
+    public setSettings(value: any) {
+        this.setValue(this.settingsKey, JSON.stringify(value));
+    }
+
+    public getProductFavorites() {
+        return this.getValue(this.productFavoritesKey).then(favorites => {
+            return JSON.parse(favorites);
+        });
+    }
+
+    public setProductFavorites(value: any) {
+        this.setValue(this.productFavoritesKey, JSON.stringify(value));
+    }
+
+    public removeStorage() {
+        this.storage.clear();
+    }
+
+    private getValue(key: string) {
+        return this.storage.get(key);
+    }
+
+    private setValue(key: string, value: string) {
+        return this.storage.set(key, value);
+    }
 }

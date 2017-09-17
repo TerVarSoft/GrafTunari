@@ -5,7 +5,7 @@ import { User } from './user';
  */
 export class UserToken {
 
-  user: User;
+    user: User;
 
-  token: string;
+    token: string;
 }

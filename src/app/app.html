@@ -1,1 +1,3 @@
-<ion-nav *ngIf="isReady" [root]="rootPage"></ion-nav>
+<ion-split-pane *ngIf="isReady">
+    <ion-nav #rootNavController [root]="rootPage" main></ion-nav>
+</ion-split-pane>

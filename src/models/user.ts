@@ -3,11 +3,11 @@
  */
 export class User {
 
-  name: string;
+    name: string;
 
-  lastName: string;
+    lastName: string;
 
-  role: string;
+    role: string;
 
-  userName: string;
+    userName: string;
 }

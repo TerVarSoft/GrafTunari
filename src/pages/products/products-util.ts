@@ -3,7 +3,6 @@ import { AlertController, Alert } from 'ionic-angular';
 
 import { SettingsCache } from '../../providers/settings-cache';
 
-import { Product } from '../../models/product';
 
 /**
  * Utility class for products endpoint provider. 

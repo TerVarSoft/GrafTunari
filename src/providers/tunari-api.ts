@@ -2,70 +2,71 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Injectable } from '@angular/core';
 import { Http, Headers, ResponseContentType, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
 
-import { TunariStorage } from './tunari-storage'; 
+import { TunariStorage } from './tunari-storage';
 
 /**
  * Tunari Api, generic REST api handler.
  */
 @Injectable()
 export class TunariApi {
-  
-  baseUrl: string = 'https://tunariserver.herokuapp.com/api/';
 
-  authKey: string = 'authorization';
+    baseUrl: string = 'https://tunariserver.herokuapp.com/api/';
 
-  headers: Headers;    
+    authKey: string = 'authorization';
 
-  constructor(public http: Http, public storage: TunariStorage, 
-    public sanitizer: DomSanitizer) {    
-    this.headers = new Headers({ 'Content-Type': 'application/json' });
-  }
+    headers: Headers;
 
-  get(endpoint: string, requestOptions: RequestOptions = new RequestOptions()) {
-    let url = this.baseUrl + endpoint;
-    requestOptions.headers = new Headers(this.headers);
+    constructor(public http: Http, public storage: TunariStorage,
+        public sanitizer: DomSanitizer) {
+        this.headers = new Headers({ 'Content-Type': 'application/json' });
+    }
 
-    return this.getApiToken().flatMap(token => {
-      if(token) {
-        requestOptions.headers.append(this.authKey, 'Bearer ' + token);
-      }
+    get(endpoint: string, requestOptions: RequestOptions = new RequestOptions()) {
+        let url = this.baseUrl + endpoint;
+        requestOptions.headers = new Headers(this.headers);
 
-      return this.http.get(url, requestOptions)
-        .map(resp => resp.json().data);
-    });    
-  }
+        return this.getApiToken().flatMap(token => {
+            if (token) {
+                requestOptions.headers.append(this.authKey, 'Bearer ' + token);
+            }
 
-  post(endpoint: string, body: any) {
-    let url = this.baseUrl + endpoint;
-    let requestOptions = new RequestOptions({ headers: this.headers });
+            return this.http.get(url, requestOptions)
+                .map(resp => resp.json().data);
+        });
+    }
 
-    return this.http
-      .post(url, body, requestOptions)
-      .map(resp => resp.json().data);
-  }
+    post(endpoint: string, body: any) {
+        let url = this.baseUrl + endpoint;
+        let requestOptions = new RequestOptions({ headers: this.headers });
 
-  getImage(productUrl: string) {
-    let requestOptions = new RequestOptions({ 
-      headers: new Headers(this.headers), 
-      responseType: ResponseContentType.Blob 
-    });
+        return this.http
+            .post(url, body, requestOptions)
+            .map(resp => resp.json().data)
+    }
 
-    return this.getApiToken().flatMap(token => {
-      if(token) {
-        requestOptions.headers.append(this.authKey, 'Bearer ' + token);
-      }
+    getImage(productUrl: string) {
+        let requestOptions = new RequestOptions({
+            headers: new Headers(this.headers),
+            responseType: ResponseContentType.Blob
+        });
 
-      return this.http.get(productUrl, requestOptions)
-        .map(res => res.blob())
-        .map(blob => URL.createObjectURL(blob))        
-    });      
-  }
+        return this.getApiToken().flatMap(token => {
+            if (token) {
+                requestOptions.headers.append(this.authKey, 'Bearer ' + token);
+            }
 
-  private getApiToken(): Observable<Headers> {
-    return Observable.fromPromise(this.storage.getAuthtoken());
-  }
+            return this.http.get(productUrl, requestOptions)
+                .map(res => res.blob())
+                .map(blob => URL.createObjectURL(blob))
+        });
+    }
+
+    private getApiToken(): Observable<Headers> {
+        return this.storage.getAuthtoken();
+    }
 }

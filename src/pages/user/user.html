@@ -1,0 +1,29 @@
+<ion-header>
+    <ion-navbar color="primary">
+        <ion-title>
+            Informacion Usuario
+        </ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <ion-card>
+        <ion-card-header>
+            {{user.name}} {{user.lastName}}
+        </ion-card-header>
+
+        <ion-card-content>
+            Esta copia de GrafTunari esta registrada a nombre del usuario <b>{{user.userName}}</b>. 
+            Al estar registrada como usuario oficial de Grafica Tunari usted tiene acceso
+            a los precios de imprenta.
+        </ion-card-content>
+
+        <ion-row no-padding>
+            <ion-col text-center>
+                <button ion-button clear small color="danger" (click)="onLogout()">
+                    Salir
+                  </button>
+            </ion-col>
+        </ion-row>
+    </ion-card>
+</ion-content>
