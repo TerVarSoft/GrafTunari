@@ -14,21 +14,23 @@ export class ProductImgComponent implements OnInit {
 
   @Input() product: Product;
 
+  url: String = 'assets/img/loading.gif';
+
   constructor(public api: TunariApi, public util: ProductImgUtil) {}
 
   ngOnInit() { 
-    this.product.thumbnailUrl = 'assets/img/loading.gif';
+    this.url = 'assets/img/loading.gif';
 
     this.api
-      .getImage(this.util.buildProductImgUrl(this.product))
+      .getImage(this.product.thumbnailUrl)
       .subscribe(url => {
-        this.product.thumbnailUrl = url;
+        this.url = url;
       },
       error => {
         if(error.status === 0) {
-          this.product.thumbnailUrl = 'assets/img/errorLoading.gif';
+          this.url = 'assets/img/errorLoading.gif';
         } else if(error.status === 404) {
-          this.product.thumbnailUrl = 'assets/img/defaultProduct.png';
+          this.url = 'assets/img/defaultProduct.png';
         }
       });
   }

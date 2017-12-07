@@ -26,7 +26,7 @@ import { User } from '../../models/user';
     providers: [ProductsUtil]
 })
 export class ProductsPage implements OnInit {
-    tet: string = 'hel';
+
     private isPublicUser: boolean = true;
 
     private user: User;
@@ -118,8 +118,8 @@ export class ProductsPage implements OnInit {
     private setDefaultValues() {
         this.storage.getUser().subscribe((user: User) => {
             console.log(`User is logged as: ${user.role}`)
-            
-            this.isPublicUser = (user.role == 'public');
+
+            this.isPublicUser = (user.role == 'public') ? true : false;
             this.user = user;
 
             this.selectedPrice = this.isPublicUser ? 'publicPackagePrice' : 'clientPackagePrice';

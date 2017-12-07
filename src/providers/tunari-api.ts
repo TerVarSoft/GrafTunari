@@ -51,19 +51,13 @@ export class TunariApi {
 
     getImage(productUrl: string) {
         let requestOptions = new RequestOptions({
-            headers: new Headers(this.headers),
+            headers: new Headers(),
             responseType: ResponseContentType.Blob
         });
 
-        return this.getApiToken().flatMap(token => {
-            if (token) {
-                requestOptions.headers.append(this.authKey, 'Bearer ' + token);
-            }
-
-            return this.http.get(productUrl, requestOptions)
-                .map(res => res.blob())
-                .map(blob => URL.createObjectURL(blob))
-        });
+        return this.http.get(productUrl, requestOptions)
+            .map(res => res.blob())
+            .map(blob => URL.createObjectURL(blob));
     }
 
     private getApiToken(): Observable<Headers> {
