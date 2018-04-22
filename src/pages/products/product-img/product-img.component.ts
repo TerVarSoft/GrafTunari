@@ -44,9 +44,9 @@ export class ProductImgComponent implements OnInit {
     event.stopPropagation();
 
     this.storage.getUser().subscribe((user: User) => {
-      const isPublicUser = (user.role == 'public') ? true : false;
+      const isClientUser = (user.role == 'client') ? true : false;
 
-      if (isPublicUser) {
+      if (isClientUser) {
         this.navCtrl.push(ProductPreviewPage, {
           product: product
         });
