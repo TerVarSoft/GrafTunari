@@ -9,9 +9,13 @@ export class Product {
 
     properties: any;
 
+    prices: any[];
+
     publicPackagePrice: number;
 
     publicUnitPrice: number;
 
     thumbnailUrl: string;
+
+    publicPreviewUrl: string;
 }

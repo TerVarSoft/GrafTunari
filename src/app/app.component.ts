@@ -3,8 +3,10 @@ import { LoadingController, AlertController, Platform, NavController } from 'ion
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Network } from "@ionic-native/network";
+import { Events } from 'ionic-angular';
 
 import { ProductsPage } from '../pages/products/products';
+import { LoginPage } from '../pages/login/login';
 
 import { Connection } from '../providers/connection';
 import { Login } from '../providers/login';
@@ -36,7 +38,8 @@ export class GrafTunariApp {
         public notifier: TunariNotifier,
         public settingsProvider: SettingsCache,
         public login: Login,
-        public connection: Connection
+        public connection: Connection,
+        public events: Events
     ) {
         platform.ready().then(() => {
             // Okay, so the platform is ready and our plugins are available.
@@ -56,6 +59,10 @@ export class GrafTunariApp {
                 this.notifier.createToast(this.messages.noInternetError);
             }
 
+            this.events.subscribe('user:logout', () => {
+                this.onLogout();
+            });
+
             this.initialLogin();
         });
     }
@@ -67,6 +74,11 @@ export class GrafTunariApp {
             this.isReady = true;
             loader.dismiss();
         });
+    }
+
+    onLogout() {
+        this.storage.removeStorage();
+        this.navCtrl.setRoot(LoginPage);
     }
 }
 

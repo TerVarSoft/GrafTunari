@@ -37,9 +37,8 @@ export class ProductsPage implements OnInit {
 
     private page: number = 0;
 
-    private selectedPrice: string;
-
-    private selectedPriceText: string;
+    // Price to show to clients should be the first one.
+    private selectedPrice: number = 0;    
 
     constructor(public keyboard: Keyboard,
         public renderer: Renderer,
@@ -50,14 +49,14 @@ export class ProductsPage implements OnInit {
         public notifier: TunariNotifier,
         public storage: TunariStorage,
         public messages: TunariMessages,
-        public connection: Connection) {}
+        public connection: Connection) { }
 
     ngOnInit() {
         this.setDefaultValues()
         this.setupKeyboard();
         this.initFavorites();
         this.initSearchQuery();
-        
+
     }
 
     public pullNextProductsPage(infiniteScroll) {
@@ -68,12 +67,12 @@ export class ProductsPage implements OnInit {
             this.productsProvider.get(this.searchQuery.value, this.page)
                 .map(productsObject => productsObject.items)
                 .subscribe(
-                products => this.products.push(...products),
-                null,
-                () => {
-                    infiniteScroll.complete();
-                    console.log('Finished pulling page successfully');
-                });
+                    products => this.products.push(...products),
+                    null,
+                    () => {
+                        infiniteScroll.complete();
+                        console.log('Finished pulling page successfully');
+                    });
         } else {
             infiniteScroll.complete();
         }
@@ -84,20 +83,6 @@ export class ProductsPage implements OnInit {
     }
 
     /** Main Fab button functions. */
-
-    selectPriceToShow(fab: FabContainer) {
-        fab.close();
-        let alert: Alert = this.util.getSelectPriceAlert(this.selectedPrice);
-
-        alert.addButton({
-            text: 'OK',
-            handler: key => {
-                this.selectedPrice = key;
-                this.selectedPriceText = this.util.getSelectedPriceText(key);
-            }
-        });
-        alert.present();
-    }
 
     /** Toolbar buttons actions*/
 
@@ -121,10 +106,6 @@ export class ProductsPage implements OnInit {
 
             this.isPublicUser = (user.role == 'public') ? true : false;
             this.user = user;
-
-            this.selectedPrice = this.isPublicUser ? 'publicPackagePrice' : 'clientPackagePrice';
-            this.selectedPriceText
-                = this.util.getSelectedPriceText(this.selectedPrice);
         });
     }
 
@@ -142,10 +123,10 @@ export class ProductsPage implements OnInit {
 
     private initFavorites() {
         this.page = 0;
-        this.productsProvider.getFavorites().then(productsObject => {
-            if (productsObject) {
+        this.productsProvider.getFavorites().then(cachedFavorites => {
+            if (cachedFavorites && cachedFavorites.length > 0) {
                 console.log("Favorites pulled from storage...");
-                this.products = productsObject.items;
+                this.products = cachedFavorites;
                 this.updateFavoritesInBackground();
             } else {
                 console.log("Favorites pulled from the server...");
