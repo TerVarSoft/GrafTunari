@@ -78,7 +78,7 @@ export class GrafTunariApp {
 
     onLogout() {
         this.storage.removeStorage();
-        this.navCtrl.setRoot(LoginPage);
+        this.initialLogin();
     }
 }
 
